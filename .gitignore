@@ -1,0 +1,15 @@
+# Local / secret state — never commit.
+inventory.yml
+hosts
+hosts.yml
+*.retry
+.ansible/
+fact_cache/
+*.log
+
+# Secrets picked up from .env.example / env.j2.
+.env
+*.env
+
+# macOS junk
+.DS_Store
