@@ -1,154 +1,26 @@
 ---
 
-- name: Provision VPS for personal assistant
+- name: Deploy personal-assistant stack
   hosts: all
   gather_facts: true
   become: true
   vars:
-    deploy_user: "{{ deploy_user }}"
     git_repo: "{{ git_repo | default('https://github.com/rhrabun/personal-assistant.git') }}"
     stack_dir: /opt/stack
-    loopback_ip: 127.0.0.1
+    loopback_ip: [IP_ADDRESS]
 
   pre_tasks:
-    - name: Require deployment ssh key
-      ansible.builtin.assert:
-        that:
-          - deploy_ssh_key is defined and deploy_ssh_key | length > 0
-        fail_msg: >-
-          missing var. Pass deploy_ssh_key via -e, e.g.
-          -e deploy_ssh_key='ssh-ed25519 AAAA...'
+    - name: Require docker installed
+      ansible.builtin.stat:
+        path: /usr/bin/docker
+      register: docker_bin
 
-    - name: Install shell tools
-      ansible.builtin.apt:
-        name:
-          - zellij
-          - zoxide
-          - vim
-        state: present
-        update_cache: true
+    - name: Fail if docker missing
+      ansible.builtin.fail:
+        msg: "docker not installed. Run provision-os-playbook (server profile) first."
+      when: not docker_bin.stat.exists
 
   tasks:
-    # Configure server
-    - name: Create deploy user and grant sudo
-      ansible.builtin.user:
-        name: "{{ deploy_user }}"
-        groups: sudo
-        append: true
-        shell: /bin/bash
-        create_home: true
-
-    - name: Install deploy user ssh pubkey
-      ansible.posix.authorized_key:
-        user: "{{ deploy_user }}"
-        key: "{{ deploy_ssh_key }}"
-        state: present
-
-    - name: SSH hardening drop-in
-      ansible.builtin.copy:
-        dest: /etc/ssh/sshd_config.d/hardening.conf
-        content: |
-          PermitRootLogin no
-          PasswordAuthentication no
-          PubkeyAuthentication yes
-      notify: restart ssh
-
-    - name: ufw default deny incoming
-      community.general.ufw:
-        rule: default
-        direction: incoming
-        policy: deny
-        state: enabled
-
-    - name: ufw default allow outgoing
-      community.general.ufw:
-        rule: default
-        direction: outgoing
-        policy: allow
-        state: enabled
-
-    - name: ufw allow OpenSSH
-      community.general.ufw:
-        rule: allow
-        name: OpenSSH
-
-    - name: Enable ufw
-      community.general.ufw:
-        state: enabled
-
-    - name: Install unattended-upgrades
-      ansible.builtin.apt:
-        name: unattended-upgrades
-        state: present
-        update_cache: true
-
-    - name: Enable automatic security upgrades
-      ansible.builtin.copy:
-        dest: /etc/apt/apt.conf.d/20auto-upgrades
-        content: |
-          APT::Periodic::Update-Package-Lists "1";
-          APT::Periodic::Unattended-Upgrade "1";
-
-    # Configure docker
-    - name: Install docker dependencies
-      ansible.builtin.apt:
-        name:
-          - ca-certificates
-          - curl
-          - gnupg
-        state: present
-
-    - name: Add docker gpg key
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/debian/gpg
-        dest: /etc/apt/keyrings/docker.asc
-        mode: "0644"
-
-    - name: Add docker apt repo (Debian 13 = trixie)
-      ansible.builtin.deb822_repository:
-        name: docker-ce
-        types: [deb]
-        uris: https://download.docker.com/linux/debian
-        suites: [trixie]
-        components: [stable]
-        signed_by: /etc/apt/keyrings/docker.asc
-        state: present
-
-    - name: Install docker-ce + compose plugin
-      ansible.builtin.apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-compose-plugin
-        state: present
-        update_cache: true
-
-    - name: Capture /etc/docker dir state
-      ansible.builtin.file:
-        path: /etc/docker
-        state: directory
-        mode: "0755"
-
-    - name: Docker log rotation daemon.json
-      ansible.builtin.copy:
-        dest: /etc/docker/daemon.json
-        content: |
-          { "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
-      notify: restart docker
-
-    - name: Add deploy user to docker group
-      ansible.builtin.user:
-        name: "{{ deploy_user }}"
-        groups: docker
-        append: true
-
-    - name: Start docker service
-      ansible.builtin.systemd_service:
-        name: docker
-        state: started
-        enabled: true
-
     # Deploy personal-assistant stack
     - name: Clone personal-assistant into stack dir
       ansible.builtin.git:
@@ -191,14 +63,3 @@
           - "  docker exec -it hermes hermes setup"
           - "Executor UI via tunnel (loopback only):"
           - "  ssh -L 4788:{{ loopback_ip }}:4788 {{ inventory_hostname }}"
-
-  handlers:
-    - name: restart ssh
-      ansible.builtin.systemd_service:
-        name: ssh
-        state: restarted
-
-    - name: restart docker
-      ansible.builtin.systemd_service:
-        name: docker
-        state: restarted
