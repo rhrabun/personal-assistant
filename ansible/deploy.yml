@@ -22,7 +22,7 @@
     - name: Install shell tools
       ansible.builtin.apt:
         name:
-          - tmux
+          - zellij
           - zoxide
           - vim
         state: present
