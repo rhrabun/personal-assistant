@@ -1,0 +1,21 @@
+all:
+  hosts:
+    hermes:
+      ansible_host: <VPS_IP>
+      ansible_user: root
+      ansible_become: true
+      ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+      deploy_user: username
+
+      deploy_ssh_key: ssh-ed25519 AAA... you@laptop
+
+      # --- executor -----------------------------------------------------
+      better_auth_secret: <openssl rand -hex 32>
+      executor_web_base_url: ''
+      executor_bootstrap_admin_email: ''
+      executor_bootstrap_admin_password: ''
+
+      # --- hermes --------------------------------------------------------
+      llm_api_key: ''
+      telegram_bot_token: ''
