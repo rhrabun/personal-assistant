@@ -3,11 +3,10 @@
 - name: Deploy personal-assistant stack
   hosts: all
   gather_facts: true
-  become: true
   vars:
     git_repo: "{{ git_repo | default('https://github.com/rhrabun/personal-assistant.git') }}"
     stack_dir: /opt/stack
-    loopback_ip: [IP_ADDRESS]
+    loopback_ip: 127.0.0.1
 
   pre_tasks:
     - name: Require docker installed
