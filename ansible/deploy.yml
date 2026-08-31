@@ -5,7 +5,7 @@
   gather_facts: true
   vars:
     git_repo: https://github.com/rhrabun/personal-assistant.git
-    base_dir: "/home/{{ deploy_user }}/hermes-agent"
+    base_dir: "/home/{{ ansible_user }}/hermes-agent"
     stack_dir: "{{ base_dir }}/stack"
     data_dir: "{{ base_dir }}/data"
     loopback_ip: 127.0.0.1
@@ -25,26 +25,26 @@
     - name: Resolve deploy user uid/gid
       ansible.builtin.getent:
         database: passwd
-        key: "{{ deploy_user }}"
+        key: "{{ ansible_user }}"
     - name: Set user uid/gid vars
       ansible.builtin.set_fact:
-        user_uid: "{{ ansible_facts.getent_passwd[deploy_user][1] }}"
-        user_gid: "{{ ansible_facts.getent_passwd[deploy_user][2] }}"
+        user_uid: "{{ ansible_facts.getent_passwd[ansible_user][1] }}"
+        user_gid: "{{ ansible_facts.getent_passwd[ansible_user][2] }}"
 
     - name: Create hermes-agent base dir
       ansible.builtin.file:
         path: "{{ base_dir }}"
         state: directory
-        owner: "{{ deploy_user }}"
-        group: "{{ deploy_user }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0755"
 
     - name: Create data dirs
       ansible.builtin.file:
         path: "{{ data_dir }}/{{ item }}"
         state: directory
-        owner: "{{ deploy_user }}"
-        group: "{{ deploy_user }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0755"
       loop:
         - ""
