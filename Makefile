@@ -27,7 +27,7 @@ logs: ## Follow all logs
 
 ##@ Hermes
 setup: ## Configure hermes agent
-	docker exec -it hermes hermes setup
+	$(COMPOSE) exec -it hermes hermes setup
 hermes-logs: ## Follow hermes logs
 	$(COMPOSE) logs -f --tail 100 hermes
 
