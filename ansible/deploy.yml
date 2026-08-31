@@ -5,9 +5,11 @@
   gather_facts: true
   vars:
     git_repo: https://github.com/rhrabun/personal-assistant.git
-    base_dir: "/home/{{ ansible_user }}/hermes-agent"
+    home_dir: "/home/{{ ansible_user }}"
+    base_dir: "{{ home_dir }}/hermes-agent"
     stack_dir: "{{ base_dir }}/stack"
     data_dir: "{{ base_dir }}/data"
+    code_dir: "{{ home_dir }}/code"
     loopback_ip: 127.0.0.1
 
   pre_tasks:
