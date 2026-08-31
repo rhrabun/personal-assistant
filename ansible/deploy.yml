@@ -18,7 +18,7 @@
 
     - name: Fail if docker missing
       ansible.builtin.fail:
-        msg: "docker not installed. Run provision-os-playbook (server profile) first."
+        msg: "docker not installed."
       when: not docker_bin.stat.exists
 
   tasks:
@@ -89,7 +89,7 @@
           - "Stack deployed to {{ stack_dir }}."
           - "Containers:"
           - "  docker ps"
-          - "Post-deploy: configure the LLM provider + Telegram channel"
+          - "Post-deploy: configure hermes:"
           - "  docker exec -it hermes hermes setup"
           - "Executor UI via tunnel (loopback only):"
           - "  ssh -L 4788:{{ loopback_ip }}:4788 {{ inventory_hostname }}"
