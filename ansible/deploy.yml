@@ -4,7 +4,6 @@
   hosts: all
   gather_facts: true
   vars:
-    deploy_user: "{{ deploy_user | default('roman') }}"
     git_repo: https://github.com/rhrabun/personal-assistant.git
     base_dir: "/home/{{ deploy_user }}/hermes-agent"
     stack_dir: "{{ base_dir }}/stack"
