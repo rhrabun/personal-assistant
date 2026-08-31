@@ -4,8 +4,11 @@
   hosts: all
   gather_facts: true
   vars:
-    git_repo: "{{ git_repo | default('https://github.com/rhrabun/personal-assistant.git') }}"
-    stack_dir: /opt/stack
+    deploy_user: "{{ deploy_user | default('roman') }}"
+    git_repo: https://github.com/rhrabun/personal-assistant.git
+    base_dir: "/home/{{ deploy_user }}/hermes-agent"
+    stack_dir: "{{ base_dir }}/stack"
+    data_dir: "{{ base_dir }}/data"
     loopback_ip: 127.0.0.1
 
   pre_tasks:
@@ -20,6 +23,35 @@
       when: not docker_bin.stat.exists
 
   tasks:
+    - name: Resolve deploy user uid/gid
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ deploy_user }}"
+    - name: Set user uid/gid vars
+      ansible.builtin.set_fact:
+        user_uid: "{{ ansible_facts.getent_passwd[deploy_user][1] }}"
+        user_gid: "{{ ansible_facts.getent_passwd[deploy_user][2] }}"
+
+    - name: Create hermes-agent base dir
+      ansible.builtin.file:
+        path: "{{ base_dir }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0755"
+
+    - name: Create data dirs
+      ansible.builtin.file:
+        path: "{{ data_dir }}/{{ item }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0755"
+      loop:
+        - ""
+        - hermes-data
+        - executor-data
+
     # Deploy personal-assistant stack
     - name: Clone personal-assistant into stack dir
       ansible.builtin.git:

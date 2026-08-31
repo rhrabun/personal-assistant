@@ -2,13 +2,14 @@ services:
   executor:
     image: ${EXECUTOR_IMAGE:?set EXECUTOR_IMAGE in .env}
     restart: unless-stopped
+    user: "${EXECUTOR_UID:?set EXECUTOR_UID in .env}:${EXECUTOR_GID:?set EXECUTOR_GID in .env}"
     environment:
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       EXECUTOR_WEB_BASE_URL: ${EXECUTOR_WEB_BASE_URL}
       EXECUTOR_BOOTSTRAP_ADMIN_EMAIL: ${EXECUTOR_BOOTSTRAP_ADMIN_EMAIL}
       EXECUTOR_BOOTSTRAP_ADMIN_PASSWORD: ${EXECUTOR_BOOTSTRAP_ADMIN_PASSWORD}
     volumes:
-      - executor-data:/data
+      - ${DATA_DIR}/executor-data:/data
     ports:
       - "127.0.0.1:4788:4788"
     mem_limit: 1g
@@ -24,12 +25,12 @@ services:
     command: gateway run
     restart: unless-stopped
     env_file: .env
+    environment:
+      HERMES_UID: ${EXECUTOR_UID:?set EXECUTOR_UID in .env}
+      HERMES_GID: ${EXECUTOR_GID:?set EXECUTOR_GID in .env}
     volumes:
-      - ./hermes-data:/opt/data
+      - ${DATA_DIR}/hermes-data:/opt/data
     mem_limit: 2500m
     depends_on:
       executor:
         condition: service_healthy
-
-volumes:
-  executor-data:
