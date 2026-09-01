@@ -10,7 +10,7 @@ help: ## Show help message
 
 ##@ Stack
 up: ## Start stack (pull + up)
-	$(COMPOSE) pull --quiet
+	$(COMPOSE) pull
 	$(COMPOSE) up -d
 down: ## Stop and remove containers (data kept)
 	$(COMPOSE) down
