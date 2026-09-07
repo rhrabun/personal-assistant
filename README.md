@@ -1,1 +1,44 @@
-IyBQZXJzb25hbCBBc3Npc3RhbnQKClNlbGYtaG9zdGVkIEFJIGFzc2lzdGFudCBzdGFjayAoSGVybWVzIGFnZW50ICsgRXhlY3V0b3IgTUNQIGdhdGV3YXkpIHdpdGggYW4gQW5zaWJsZSBwcm92aXNpb25pbmcgcGxheWJvb2sgZm9yIHRoZSBWUFMgaXQgcnVucyBvbi4KCiMgSG93LVRvOgoKIyMgRGVwbG95IHRvIGEgZnJlc2ggVlBTCgpgYGAKY2QgYW5zaWJsZQphbnNpYmxlLWdhbGF4eSBjb2xsZWN0aW9uIGluc3RhbGwgYW5zaWJsZS5wb3NpeCBjb21tdW5pdHkuZ2VuZXJhbApjcCBleGFtcGxlLmludmVudG9yeS55bWwgaW52ZW50b3J5LnltbCAgICMgZmlsbCBpbgptYWtlIHJ1biAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMgb3I6IG1ha2UgZHJ5LXJ1biB0byBwcmV2aWV3CmBgYAoKLSBGaWxsIGBhbnNpYmxlL2ludmVudG9yeS55bWxgIChmcm9tIGBleGFtcGxlLmludmVudG9yeS55bWxgKSBmaXJzdDogVlBTIElQLCBTU0gga2V5LCBhbmQgZW52IHNlY3JldHMgKGB0ZWxlZ3JhbV9ib3RfdG9rZW5gLCBgbGxtX2FwaV9rZXlgLCBgYmV0dGVyX2F1dGhfc2VjcmV0YCwgYGV4ZWN1dG9yXypgKQotIERvY2tlciBtdXN0IGFscmVhZHkgYmUgaW5zdGFsbGVkIG9uIHRoZSB0YXJnZXQg4oCUIHRoZSBwbGF5Ym9vayBmYWlscyBpZiBpdCBpc24ndAotIFRoZSBwbGF5Ym9vayBjbG9uZXMgdGhpcyByZXBvIHRvIGB+L2hlcm1lcy1hZ2VudC9zdGFja2AsIHRlbXBsYXRlcyBgLmVudmAgKGNobW9kIDYwMCksIGFuZCBicmluZ3MgdXAgdGhlIHN0YWNrCi0gVXNlciBtdXN0IGV4aXN0IGFuZCBvd24gdGhlIGRlcGxveSBwYXRoczogcnVuIGFzIHRoYXQgYGFuc2libGVfdXNlcmAKCiMjIEFmdGVyIGRlcGxveQoKYGBgCm1ha2Ugc2V0dXAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMgTExNIHByb3ZpZGVyICsgVGVsZWdyYW0gY2hhbm5lbApgYGAKCihgZG9ja2VyIGV4ZWMgLWl0IGhlcm1lcyBoZXJtZXMgc2V0dXBgKQoKV2lyZSBoZXJtZXMgdG8gZXhlY3V0b3IncyBNQ1AgZW5kcG9pbnQgaW4gaGVybWVzIGNvbmZpZzoKYGh0dHA6Ly9leGVjdXRvcjo0Nzg4L21jcGAgKGNvbXBvc2UtaW50ZXJuYWwgRE5TLCBsb29wYmFjay1vbmx5KS4KCkV4ZWN1dG9yIFVJIHZpYSBTU0ggdHVubmVsOgoKYGBgCnNzaCAtTCA0Nzg4OjEyNy4wLjAuMTo0Nzg4IDx2cHM+ICAgIyB0aGVuIG9wZW4gaHR0cDovL2xvY2FsaG9zdDo0Nzg4CmBgYAoKIyMgTG9jYWwgcnVuCgpgYGAKY3AgYW5zaWJsZS90ZW1wbGF0ZXMvZW52LmoyIC5lbnYgICAjIGZpbGwgaW4KZG9ja2VyIGNvbXBvc2UgdXAgLWQKYGBgCgpSb290IGBNYWtlZmlsZWAgY292ZXJzIGV2ZXJ5ZGF5IHN0YWNrIG9wcyAoYG1ha2UgdXBgLCBgc2V0dXBgLCBgc3RhdHVzYCwgYGxvZ3NgLCBgZXhlY3V0b3ItbG9nc2AsIOKApiku
+# Personal Assistant
+
+Self-hosted AI assistant stack (Hermes agent + Executor MCP gateway) with an Ansible provisioning playbook for the VPS it runs on.
+
+# How-To:
+
+## Deploy to a fresh VPS
+
+```
+cd ansible
+ansible-galaxy collection install ansible.posix community.general
+cp example.inventory.yml inventory.yml   # fill in
+make run                                 # or: make dry-run to preview
+```
+
+- Fill `ansible/inventory.yml` (from `example.inventory.yml`) first: VPS IP, SSH key, and env secrets (`telegram_bot_token`, `llm_api_key`, `better_auth_secret`, `executor_*`)
+- Docker must already be installed on the target - the playbook fails if it is not
+- The playbook clones this repo to `~/hermes-agent/stack`, templates `.env` (chmod 600), and brings up the stack
+- User must exist and own the deploy paths: run as that `ansible_user`
+
+## After deploy
+
+```
+make setup                              # LLM provider + Telegram channel
+```
+
+(`docker exec -it hermes hermes setup`)
+
+Wire hermes to executor's MCP endpoint in hermes config:
+`http://executor:4788/mcp` (compose-internal DNS, loopback-only).
+
+Executor UI via SSH tunnel:
+```
+ssh -L 4788:127.0.0.1:4788 <vps>   # then open http://localhost:4788
+```
+
+## Local run
+
+```
+cp ansible/templates/env.j2 .env   # fill in
+docker compose up -d
+```
+
+Root `Makefile` covers everyday stack ops (`make up`, `setup`, `status`, `logs`, `executor-logs`, ...).
