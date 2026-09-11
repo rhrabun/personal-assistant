@@ -1,0 +1,57 @@
+---
+- name: Install restic
+  ansible.builtin.package:
+    name: restic
+    state: present
+  become: true
+
+- name: Configure restic
+  block:
+    - name: Create config directory
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.config/restic"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0700"
+
+    - name: Write credentials
+      ansible.builtin.template:
+        src: restic-env.j2
+        dest: "{{ home_dir }}/.config/restic/env"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0600"
+
+    - name: Write settings
+      ansible.builtin.template:
+        src: backup.conf.j2
+        dest: "{{ home_dir }}/.config/restic/backup.conf"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
+
+- name: Write backup script
+  ansible.builtin.template:
+    src: vps-backup.sh.j2
+    dest: "{{ home_dir }}/.local/bin/vps-backup.sh"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0700"
+
+- name: Schedule backup
+  ansible.builtin.cron:
+    name: restic backup
+    user: "{{ ansible_user }}"
+    minute: "{{ restic_backup_schedule.minute }}"
+    hour: "{{ restic_backup_schedule.hour }}"
+    job: "bash {{ home_dir }}/.local/bin/vps-backup.sh >> {{ home_dir }}/.config/restic/vps-backup.log 2>&1"
+
+- name: Schedule repository check
+  ansible.builtin.cron:
+    name: restic check
+    user: "{{ ansible_user }}"
+    minute: "{{ restic_check_schedule.minute }}"
+    hour: "{{ restic_check_schedule.hour }}"
+    weekday: "{{ restic_check_schedule.weekday }}"
+    job: "set -a; . {{ home_dir }}/.config/restic/env; set +a; /usr/bin/restic check >> {{ home_dir }}/.config/restic/vps-restic-check.log 2>&1"
