@@ -1,6 +1,6 @@
 # Run `make` to see commands
 
-.PHONY: help up down restart stop start status logs setup hermes-logs executor-logs
+.PHONY: help up down restart stop start status logs setup hermes-logs executor-logs restic-snapshots restic-check restic-stats backup-now backup-log
 .DEFAULT_GOAL := help
 
 COMPOSE := docker compose
@@ -34,3 +34,15 @@ hermes-logs: ## Follow hermes logs
 ##@ Executor
 executor-logs: ## Follow executor logs
 	$(COMPOSE) logs -f --tail 100 executor
+
+##@ Backup
+restic-snapshots: ## List restic snapshots
+	set -a; . ~/.config/restic/env; set +a; restic snapshots
+restic-check: ## Verify restic repo integrity
+	set -a; . ~/.config/restic/env; set +a; restic check
+restic-stats: ## Restic repo stats
+	set -a; . ~/.config/restic/env; set +a; restic stats --mode raw-data
+backup-now: ## Run backup script now
+	bash ~/.local/bin/vps-backup.sh
+backup-log: ## Tail backup log
+	tail -n 50 ~/.config/restic/vps-backup.log
