@@ -95,3 +95,6 @@
           - "  docker exec -it hermes hermes setup"
           - "Executor UI via tunnel (loopback only):"
           - "  ssh -L 4788:{{ loopback_ip }}:4788 {{ inventory_hostname }}"
+
+  roles:
+    - role: backup

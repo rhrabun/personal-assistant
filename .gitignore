@@ -11,5 +11,11 @@ fact_cache/
 .env
 *.env
 
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+infra/crash.log
+
 # macOS junk
 .DS_Store
