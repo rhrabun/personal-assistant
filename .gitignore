@@ -16,6 +16,7 @@ infra/*.tfstate
 infra/*.tfstate.*
 infra/*.tfvars
 infra/crash.log
+.terraform.lock*
 
 # macOS junk
 .DS_Store
