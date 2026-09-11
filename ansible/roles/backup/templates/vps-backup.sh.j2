@@ -1,8 +1,3 @@
-#!/usr/bin/env bash
-#
-# restic backup to S3. Credentials are read from ${HOME}/.config/restic/env,
-# settings (backup and exclude paths) from ${HOME}/.config/restic/backup.conf.
-# Run manually or from the cron entry installed by ansible.
 set -euo pipefail
 
 CFG="{{ home_dir }}/.config/restic"
@@ -23,7 +18,7 @@ for p in "${BACKUP_PATHS[@]}"; do
   [ -d "$p" ] && SRC+=("$p")
 done
 
-if [ "${#SRC[@]}" -eq 0 ]; then
+if [ "{% raw %}${#SRC[@]}{% endraw %}" -eq 0 ]; then
   echo "$(date -Is) no backup source dirs present" >> "${CFG}/vps-backup.log"
   exit 1
 fi
