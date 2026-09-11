@@ -1,10 +1,4 @@
 ---
-- name: Install restic
-  ansible.builtin.package:
-    name: restic
-    state: present
-  become: true
-
 - name: Configure restic
   block:
     - name: Create config directory
