@@ -26,7 +26,7 @@ logs: ## Follow all logs
 	$(COMPOSE) logs -f --tail 100
 
 ##@ Hermes
-setup: ## Configure hermes agent
+hermes-setup: ## Configure hermes agent
 	$(COMPOSE) exec -it hermes hermes setup
 hermes-logs: ## Follow hermes logs
 	$(COMPOSE) logs -f --tail 100 hermes
@@ -36,11 +36,11 @@ executor-logs: ## Follow executor logs
 	$(COMPOSE) logs -f --tail 100 executor
 
 ##@ Backup
-restic-snapshots: ## List restic snapshots
+backup-snapshots: ## List restic snapshots
 	set -a; . ~/.config/restic/env; set +a; restic snapshots
-restic-check: ## Verify restic repo integrity
+backup-check: ## Verify restic repo integrity
 	set -a; . ~/.config/restic/env; set +a; restic check
-restic-stats: ## Restic repo stats
+backup-stats: ## Restic repo stats
 	set -a; . ~/.config/restic/env; set +a; restic stats --mode raw-data
 backup-now: ## Run backup script now
 	bash ~/.local/bin/vps-backup.sh
