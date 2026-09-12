@@ -9,7 +9,7 @@ help: ## Show help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 run: ## Run deploy playbook
-	ansible-playbook deploy.yml $(INV)
+	ansible-playbook deploy.yml $(INV) --ask-vault-pass
 
 dry-run: ## Dry-run deploy playbook
-	ansible-playbook deploy.yml $(INV) --check --diff
+	ansible-playbook deploy.yml $(INV) --check --diff --ask-vault-pass

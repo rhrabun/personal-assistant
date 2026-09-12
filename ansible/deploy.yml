@@ -3,14 +3,9 @@
 - name: Deploy personal-assistant stack
   hosts: all
   gather_facts: true
-  vars:
-    git_repo: https://github.com/rhrabun/personal-assistant.git
-    home_dir: "/home/{{ ansible_user }}"
-    base_dir: "{{ home_dir }}/hermes-agent"
-    stack_dir: "{{ base_dir }}/stack"
-    data_dir: "{{ base_dir }}/data"
-    code_dir: "{{ home_dir }}/code"
-    loopback_ip: 127.0.0.1
+  vars_files:
+    - vars/secrets.yml
+    - vars/defaults.yml
 
   pre_tasks:
     - name: Require docker installed
