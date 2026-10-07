@@ -1,4 +1,5 @@
-RESTIC_REPOSITORY={{ ("s3:https://s3." ~ aws_region ~ ".amazonaws.com/" ~ backup_bucket) | quote }}
+RESTIC_REPOSITORY={{ ("s3:https://" ~ r2_account_id ~ ("." ~ r2_jurisdiction if r2_jurisdiction else "") ~ ".r2.cloudflarestorage.com/" ~ r2_bucket) | quote }}
 RESTIC_PASSWORD={{ restic_password | quote }}
-AWS_ACCESS_KEY_ID={{ aws_access_key_id | quote }}
-AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key | quote }}
+AWS_ACCESS_KEY_ID={{ r2_access_key_id | quote }}
+AWS_SECRET_ACCESS_KEY={{ r2_secret_access_key | quote }}
+AWS_DEFAULT_REGION=auto

@@ -1,6 +1,7 @@
 git_repo: https://github.com/rhrabun/personal-assistant.git
 
-aws_region: "eu-central-1"
+# R2 endpoint jurisdiction: '' for default, else 'eu'/'us'/'fedramp'.
+r2_jurisdiction: 'eu'
 
 executor_web_base_url: ''
 loopback_ip: 127.0.0.1
