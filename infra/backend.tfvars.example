@@ -1,4 +1,0 @@
-bucket = "<state-bucket>"
-key    = "personal-assistant.tfstate"
-region = "eu-central-1"
-encrypt = true
