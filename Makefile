@@ -1,6 +1,6 @@
 # Run `make` to see commands
 
-.PHONY: help up down restart stop start status logs setup hermes-logs executor-logs restic-snapshots restic-check restic-stats backup-now backup-log
+.PHONY: help up down restart stop start status logs hermes-setup hermes-logs executor-logs backup-snapshots backup-check backup-stats backup-now backup-log
 .DEFAULT_GOAL := help
 
 COMPOSE := docker compose
