@@ -13,7 +13,8 @@ cp example.inventory.yml inventory.yml   # fill in
 make run                                 # or: make dry-run to preview
 ```
 
-- Fill `ansible/inventory.yml` (from `example.inventory.yml`) first: VPS IP, SSH key, and env secrets (`telegram_bot_token`, `llm_api_key`, `better_auth_secret`, `executor_*`)
+- Fill `ansible/inventory.yml` (from `example.inventory.yml`) with the VPS IP and SSH key.
+- Secrets go in `ansible/vars/secrets.yml` (from `example.secrets.yml`; encrypt with `ansible-vault`)
 - Docker must already be installed on the target - the playbook fails if it is not
 - The playbook clones this repo to `~/hermes-agent/stack`, templates `.env` (chmod 600), and brings up the stack
 - User must exist and own the deploy paths: run as that `ansible_user`
@@ -21,7 +22,7 @@ make run                                 # or: make dry-run to preview
 ## After deploy
 
 ```
-make setup                              # LLM provider + Telegram channel
+make hermes-setup                       # LLM provider + Telegram channel
 ```
 
 (`docker exec -it hermes hermes setup`)
@@ -34,6 +35,19 @@ Executor UI via SSH tunnel:
 ssh -L 4788:127.0.0.1:4788 <vps>   # then open http://localhost:4788
 ```
 
+## Backups
+
+`restic` snapshots the data dir to a Cloudflare R2 bucket.
+The `backup` role schedules a daily backup + prune and a weekly `restic check`.
+
+```
+make backup-now          # run backup + prune now
+make backup-snapshots    # list snapshots
+make backup-check        # verify repo integrity
+make backup-stats        # repo size
+make backup-log          # tail backup log
+```
+
 ## Local run
 
 ```
@@ -41,4 +55,4 @@ cp ansible/templates/env.j2 .env   # fill in
 docker compose up -d
 ```
 
-Root `Makefile` covers everyday stack ops (`make up`, `setup`, `status`, `logs`, `executor-logs`, ...).
+Root `Makefile` covers everyday stack ops.
