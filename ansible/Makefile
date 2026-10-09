@@ -5,11 +5,14 @@
 
 INV := -i inventory.yml
 
+# Host or host group to target from inventory (default: all).
+host ?= all
+
 help: ## Show help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-run: ## Run deploy playbook
-	ansible-playbook deploy.yml $(INV) --ask-vault-pass
+run: ## Run deploy playbook (make run host=<user>)
+	ansible-playbook deploy.yml $(INV) --limit $(host) --ask-vault-pass
 
-dry-run: ## Dry-run deploy playbook
-	ansible-playbook deploy.yml $(INV) --check --diff --ask-vault-pass
+dry-run: ## Dry-run deploy playbook (make dry-run host=<user>)
+	ansible-playbook deploy.yml $(INV) --check --diff --limit $(host) --ask-vault-pass
