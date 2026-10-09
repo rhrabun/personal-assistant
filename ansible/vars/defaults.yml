@@ -5,6 +5,8 @@ r2_jurisdiction: 'eu'
 
 executor_web_base_url: ''
 loopback_ip: 127.0.0.1
+executor_port: 4788
+enable_executor: true
 
 home_dir: "/home/{{ ansible_user }}"
 base_dir: "{{ home_dir }}/hermes-agent"
