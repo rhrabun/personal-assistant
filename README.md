@@ -32,7 +32,7 @@ Wire hermes to executor's MCP endpoint in hermes config:
 
 Executor UI via SSH tunnel:
 ```
-ssh -L 4788:127.0.0.1:4788 <vps>   # then open http://localhost:4788
+ssh -L 4788:127.0.0.1:4788 <vps>   # then open http://127.0.0.1:4788
 ```
 
 ## Backups
