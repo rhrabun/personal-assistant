@@ -1,6 +1,6 @@
 # Run `make` to see commands
 
-.PHONY: help up down restart stop start status logs hermes-setup hermes hermes-logs executor-logs backup-snapshots backup-check backup-stats backup-now backup-log
+.PHONY: help up down restart stop start status logs hermes-setup hermes hermes-shell hermes-logs executor-logs backup-snapshots backup-check backup-stats backup-now backup-log
 .DEFAULT_GOAL := help
 
 COMPOSE := docker compose
@@ -30,6 +30,8 @@ hermes: ## Run any hermes command: make hermes cmd="vault add --kind login"
 	$(COMPOSE) exec -it hermes hermes $(cmd)
 hermes-setup: ## Configure hermes agent
 	$(COMPOSE) exec -it hermes hermes setup
+hermes-shell: ## Shell into hermes container
+	$(COMPOSE) exec -it hermes bash
 hermes-logs: ## Follow hermes logs
 	$(COMPOSE) logs -f --tail 100 hermes
 
