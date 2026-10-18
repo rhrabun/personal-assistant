@@ -40,6 +40,11 @@ ssh -L 4788:127.0.0.1:4788 <vps>   # then open http://127.0.0.1:4788
 `restic` snapshots the data dir to a Cloudflare R2 bucket.
 The `backup` role schedules a daily backup + prune and a weekly `restic check`.
 
+`restic-db-dump.py` writes consistent copies of the databases to
+`.dbsnap/` first, since a torn copy of a WAL-mode database may not open. To
+restore: `restic restore latest --target /`, then copy each `.dbsnap/**/*.sqlite`
+back over its matching `.db`.
+
 ```
 make backup-now          # run backup + prune now
 make backup-snapshots    # list snapshots
