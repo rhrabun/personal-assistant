@@ -8,6 +8,5 @@ restic_check_schedule:
   hour: "3"
   weekday: "0"
 
-restic_keep_daily: 7
-restic_keep_weekly: 4
-restic_keep_monthly: 12
+restic_keep_daily: 14
+restic_keep_monthly: 3
