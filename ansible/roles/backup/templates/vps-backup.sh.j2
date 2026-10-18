@@ -28,6 +28,11 @@ for e in "${EXCLUDE_PATHS[@]}"; do
   [ -n "$e" ] && EXCL+=(--exclude "$e")
 done
 
+# Live sqlite files are excluded; snapshot consistent copies of them instead.
+DUMP_DIR="{{ data_dir }}/.dbsnap"
+rm -rf "${DUMP_DIR}"
+"{{ home_dir }}/.local/bin/restic-db-dump.py" "{{ data_dir }}" "${DUMP_DIR}"
+
 "${RESTIC}" backup "${SRC[@]}" "${EXCL[@]}" --verbose=1
 
 "${RESTIC}" forget --prune \

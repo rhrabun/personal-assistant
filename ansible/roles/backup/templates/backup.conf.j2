@@ -3,22 +3,24 @@ BACKUP_PATHS=(
 )
 
 EXCLUDE_PATHS=(
-  # hermes toolchain, rebuilt from the image on container start
   "installs"
   "lazy-packages"
   "bin"
   "tools"
   "lsp"
   ".cua-driver"
-  # caches, scratch, browser profiles
   "*cache*"
   "*.npm"
   "*.local"
   "*node_modules*"
   ".config"
   ".pki"
-  # logs, and the ~/code bind mount
   "logs"
   "code"
   "core.*"
+  # live sqlite excluded;
+  # .dbsnap/*.sqlite holds the consistent dump written by restic-db-dump.py
+  "*.db"
+  "*.db-wal"
+  "*.db-shm"
 )
